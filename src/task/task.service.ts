@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { Task } from './entities/task.entity';
+import { StatusEnum, Task } from './entities/task.entity';
 
 @Injectable()
 export class TaskService {
@@ -9,8 +9,9 @@ export class TaskService {
     {
       id: 1,
       title: 'hello',
-      description: '1213',
-      status: null,
+      description: '',
+      status: StatusEnum.New,
+      priority: 0,
     },
   ];
 
@@ -19,7 +20,8 @@ export class TaskService {
       id: Date.now(),
       title: createTaskDto.title,
       description: createTaskDto.description || null,
-      status: null,
+      status: StatusEnum.New,
+      priority: 0,
     };
 
     this.tasks.push(task);
