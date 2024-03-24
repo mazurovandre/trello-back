@@ -1,68 +1,57 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { StatusEnum, Task } from './entities/task.entity';
+import { InjectModel } from '@nestjs/mongoose';
+import { StatusEnum, Task } from '../schemas/Task.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class TaskService {
-  private tasks: Task[] = [
-    {
-      id: 1,
-      title: 'hello',
-      description: '',
-      status: StatusEnum.New,
-      priority: 0,
-    },
-  ];
+  constructor(@InjectModel(Task.name) private taskModel: Model<Task>) {}
 
   create(createTaskDto: CreateTaskDto) {
-    const task = {
-      id: Date.now(),
+    const newTask = new this.taskModel({
       title: createTaskDto.title,
       description: createTaskDto.description || null,
       status: StatusEnum.New,
       priority: 0,
-    };
+    });
 
-    this.tasks.push(task);
-
-    return task;
+    return newTask.save();
   }
 
   findAll() {
-    return this.tasks;
+    return this.taskModel.find();
   }
 
   findIndexById(id: number) {
-    const index = this.tasks.findIndex((item) => item.id === id);
-
-    if (index === -1) {
-      throw new HttpException('Task not found', HttpStatus.NOT_FOUND);
-    }
-
-    return index;
+    return this.taskModel.findById(id);
   }
 
-  findOne(id: number) {
-    const index = this.findIndexById(id);
+  findOne(id: string) {
+    return this.taskModel.findById(id);
+    // this._id = id;
+    // const index = this.findIndexById(id);
 
-    return this.tasks[index];
+    // return this.tasks[index];
   }
 
   update(id: number, updateTaskDto: UpdateTaskDto) {
-    const index = this.findIndexById(id);
-
-    this.tasks[index] = {
-      ...this.tasks[index],
-      ...updateTaskDto,
-    };
-
-    return this.tasks[index];
+    return [id, updateTaskDto];
+    // const index = this.findIndexById(id);
+    //
+    // this.tasks[index] = {
+    //   ...this.tasks[index],
+    //   ...updateTaskDto,
+    // };
+    //
+    // return this.tasks[index];
   }
 
   remove(id: number) {
-    const index = this.findIndexById(id);
-
-    return this.tasks.splice(index, 1);
+    return id;
+    // const index = this.findIndexById(id);
+    //
+    // return this.tasks.splice(index, 1);
   }
 }

@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateTaskDto } from './create-task.dto';
-import { StatusEnum } from '../entities/task.entity';
+import { StatusEnum } from '../../schemas/Task.schema';
 
 export class UpdateTaskDto extends PartialType(CreateTaskDto) {
   id: number;

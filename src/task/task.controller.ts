@@ -6,10 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import mongoose from 'mongoose';
 
 @Controller('task')
 export class TaskController {
@@ -27,7 +30,19 @@ export class TaskController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.taskService.findOne(+id);
+    const isValid = mongoose.Types.ObjectId.isValid(id);
+
+    if (!isValid) {
+      throw new HttpException('Task not found', HttpStatus.NOT_FOUND);
+    }
+
+    const targetTask = this.taskService.findOne(id);
+
+    if (!targetTask) {
+      throw new HttpException('Task not found', HttpStatus.NOT_FOUND);
+    }
+
+    return targetTask;
   }
 
   @Patch(':id')
